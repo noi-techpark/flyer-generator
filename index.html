@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PDF Generator</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,200i,300,300i,400,400i,600,600i,700,700i,900,900i" rel="stylesheet">
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" href="css/foundation.css">
+	<link rel="stylesheet" href="css/project.css">
+</head>
+<body>
+	<div id="container">
+		<div class="info hide-me">
+			<h2>PDF Generator</h2>
+		</div>
+		<div class="info text">
+			<ul>
+				<li>This tool has been tested on <strong>Google Chrome only</strong></li>
+				<li>Click and <strong>drag</strong> each element to change its position</li>
+				<li>Double click on each element to enter the <strong>edit</strong> mode</li>
+				<li>Select some text and use CTRL+B for <strong>bold</strong> and CTRL+U for <strong>underline</strong></li>
+				<li>Click the <strong>+</strong> sign to add <strong>logos</strong> and the <strong>x</strong> sign to remove one</li>
+				<li>Set the <strong>PDF quality</strong> (high quality PDFs could take some time to render)</li>
+				<li>Click <strong>"Generate PDF"</strong> to create and download your PDF</li>
+			</ul>
+		</div>
+		<div id="content">		
+			<div id="page-1" class="page">
+				<img class="noi-bg" src="images/noi_bg.png" />
+				<div class="white-bg"></div>
+				<img class="noi-logo" src="images/noi_logo.png" />
+				<img id="mascotte" src="images/mascotte.png" />
+
+				<h1 id="title" class="draggable" contenteditable>JAVA<br>DEVELOPER<br>MEETINGS</h1>
+				<h2 id="title2" class="draggable" contenteditable>Every first working Thursday of the month</h2>
+				<div class="separator draggable">
+					<span class="resizable"></span>
+				</div>
+				<h2 id="title3" class="draggable" contenteditable>07.06.2018 | AWS Lambda</h2>
+			</div>
+			<div style="page-break-after: always;"></div>
+			<div id="page-2" class="page">
+				<img class="noi-bg" src="images/noi_bg.png" />
+				<div class="white-bg"></div>
+				<img class="noi-logo" src="images/noi_logo.png" />
+				<h2 id="title4" class="draggable" contenteditable>JAVA DEVELOPER MEETINGS #1</h2>
+				<h2 id="title5" class="draggable" contenteditable>07.06.2018 | AWS Lambda</h2>
+				<div id="title6" class="draggable" contenteditable>
+					NOI Techpark | NOISTERIA<br>
+					A.-Volta-Straße 15 / Via A. Volta, 15 | 39100 Bozen / Bolzano<br><br>
+					Join the event and get a free drink.
+				</div>
+				<div class="separator draggable long">
+					<span class="resizable"></span>
+				</div>
+				<span class="white-block"></span>
+				<div class="watertank">
+					<img src="images/watertank.png" class="watertank-image" />				
+				</div>
+				<div id="logos">
+					<div class="img-container">
+						<img src="images/logos/idm.png" />
+					</div>
+					<div class="img-container">
+						<img src="images/logos/unibz.png" />
+					</div>
+					<div class="img-container">
+						<img src="images/logos/fraunhofer.png" />
+					</div>
+					<div class="img-container">
+						<img src="images/logos/java.png" />
+					</div>
+				</div>
+				<div id="schedule" class="draggable">
+					<div class="hour" contenteditable="true">
+						<strong>18:30</strong><br><br><br>
+						<strong>19:00</strong><br><br>
+						Register
+					</div>
+					<div class="desc" contenteditable="true">
+						Chris Mair: Microservices with AWS Lambda<br>Just pay the milliseconds your function really uses!<br><br>
+						Open discussion<br><br>
+						<strong><u>noi.bz.it/en/noi-techpark/idm/events/<br>java-developer-meeting-aws-lambda</u></strong>
+					</div>
+				</div>		
+			</div>
+		</div>
+		<div class="add-logo hide-me">
+			<label for="files" title="Add new logo">+</label>
+			<input id="files" type="file" multiple accept="image/*"/>
+		</div>
+		<div id="btns-container">
+			<div class="pdf-quality-container">
+				<span>PDF quality</span>
+				<form>
+					<input type="radio" name="pdf-quality" class="pdf-quality" value="1.5" id="quality-1" checked="checked""><label for="quality-1">Web quality (low)</label>
+					<input type="radio" name="pdf-quality" class="pdf-quality" value="3" id="quality-2"><label for="quality-2">Web quality (high)</label>
+					<input type="radio" name="pdf-quality" class="pdf-quality" value="6" id="quality-3"><label for="quality-3">Print quality</label>
+				</form>
+			</div>
+			
+			<div id="generate-pdf" class="btn">Generate PDF</div>
+			<div id="reset" class="btn">Reset</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="js/jspdf.min.js"></script>
+<script type="text/javascript" src="js/html2canvas.js"></script>
+<script type="text/javascript">
+	var originalHtml = $("#content").html();
+	var removeSpan = $('<span class="remove hide-me" title="Remove this logo" data-html2canvas-ignore="true">✖</span>');
+	var filesInput = document.getElementById("files");
+	
+	$(document).ready(function() {
+		filesInput.addEventListener("change", function(event){
+			filesInputListener(event);
+		});
+		if(localStorage.lastGeneratedPdf) {
+			$("#content").html(JSON.parse(localStorage.lastGeneratedPdf));
+			setTimeout(function() {
+				starter();
+			},250);
+			
+		} else {
+			starter();
+		}
+		$("#generate-pdf").click(function() {
+			generate_PDF();
+			localStorage.setItem("lastGeneratedPdf", JSON.stringify($("#content").html()));
+		});
+		$("#reset").click(function() {
+			$("#content").html(originalHtml);
+			$("#files").val('');
+			starter();
+		});
+	});
+
+	function starter() {
+		dragResize();
+		imgRepeater();
+	}
+	function dragResize() {
+		$( ".draggable" ).draggable({axis: "y"})
+		.click(function() {
+			$(this).draggable({ disabled: false, axis: "y" });
+		}).dblclick(function() {
+			$(this).draggable({ disabled: true, axis: "y" });
+		});
+		$("div.ui-resizable-handle,div.ui-resizable-n").remove();
+		$( ".resizable" ).resizable({
+			resize: function(event, ui) {
+				ui.size.height = ui.originalSize.height;
+			}
+		});
+	}
+	function imgRepeater() {		
+		$("#logos .img-container").each(function() {
+			$(this).find(".remove").remove();
+			$(this).append(removeSpan.clone());
+		});
+		removeLogo();		
+	}
+	function filesInputListener(event) {
+		var files = event.target.files; //FileList object						
+		for(var i = 0; i< files.length; i++) {
+			var file = files[i];
+			var picReader = new FileReader();
+
+			picReader.removeEventListener("load",function(event) {
+				generateLogos(event);
+			});
+			picReader.addEventListener("load",function(event) {
+				generateLogos(event);
+			});
+			picReader.readAsDataURL(file);
+		}
+	}
+	function generateLogos(event) {
+		var output = $("#logos");
+		var picFile = event.target;						
+		var div = $('<div class="img-container"></div>');				
+		div.html("<img src='" + picFile.result + "'" +
+				"title='" + picFile.name + "'/>");
+		div.append(removeSpan.clone());
+		output.append(div);
+		removeLogo();
+	}
+	function removeLogo() {
+		$("#logos .img-container").on('click','.remove',function() {
+			$(this).closest('.img-container').remove();
+		});
+	}
+	function generate_PDF() {
+		var pdf = new jsPDF('l', 'mm', [1748, 1240]);
+		var pdfQuality = $(".pdf-quality:checked").val();
+		if(pdfQuality =='undefined' || pdfQuality=='')
+			pdfQuality = 3;
+		
+		var pdfFileName = 'generated_pdf_';
+		switch($(".pdf-quality:checked").attr('id')) {
+			case 'quality-1':
+				pdfFileName += 'web_quality_low_';
+				break;
+			case 'quality-3':
+				pdfFileName += 'print_quality_';
+				break;
+			default:
+				pdfFileName += 'web_quality_high_';
+				break;
+		}
+		var currentdate = new Date();
+		pdfFileName += currentdate.getFullYear()+'-'+(currentdate.getMonth()+1)+'-'+currentdate.getDate()+'-'+currentdate.getHours()+'-'+currentdate.getMinutes();
+
+		html2canvas(
+			document.getElementById('page-1'),
+			{
+				scale: pdfQuality,
+				dpi: 300,
+				logging: false,
+				width: 1748,
+				height: 1240,
+				backgroundColor: "#9842b3",
+			}
+		).then(function(canvas) {
+			var datapage1 = canvas.toDataURL('image/jpeg', 1);
+			pdf.addImage(datapage1, 'JPEG', 0,0,1748,1240);			
+			html2canvas(
+				document.getElementById('page-2'),
+				{
+					scale: pdfQuality,
+					dpi: 300,
+					logging: false,
+					width: 1748,
+					height: 1240,
+					backgroundColor: "#9842b3",
+				}
+			).then(function(canvas) {
+				var datapage2 = canvas.toDataURL('image/jpeg', 1);
+				pdf.addPage();
+				pdf.addImage(datapage2, 'JPEG', 0,0,1748,1240);
+				pdf.save(pdfFileName+".pdf");
+			});
+		});
+	}
+</script>
+</html>
