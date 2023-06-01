@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: NOI Techpark <digital@noi.bz.it>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # Flyer Generator
 A web based generator for flyers. This version generates the flyers for the monthly Java Developer Meetings hosted by the NOI Techpark in South Tyrol.
 

@@ -1,0 +1,25 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: flyer-generator
+Upstream-Contact: NOI Techpark <digital@noi.bz.it>
+Source: https://github.com/noi-techpark/flyer-generator
+
+Files: LICENSE css/fonts/* images/* css/foundation.css.map css/project.css.map
+Copyright: (c) NOI Techpark <digital@noi.bz.it>
+License: CC0-1.0
+
+Files: css/project.css
+Copyright: (c) NOI Techpark <digital@noi.bz.it>
+License: AGPL-3.0-or-later
+
+Files: css/jquery-ui.css js/jquery-ui.min.js js/jquery.min.js
+Copyright: jQuery Foundation and other contributors
+License: MIT
+
+Files: js/jspdf.min.js
+Copyright: (c) 2010-2021 James Hall, https://github.com/MrRio/jsPDF
+           (c) 2015-2021 yWorks GmbH, https://www.yworks.com/
+License: MIT
+
+Files: js/html2canvas.js
+Copyright: (c) 2018 Niklas von Hertzen <https://hertzen.com>
+License: MIT
